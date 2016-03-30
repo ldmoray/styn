@@ -8,7 +8,7 @@ A pynt of Python build.
 ## Features
 
 * Easy to learn.
-* Build tasks are just python funtions.
+* Build tasks are just python functions.
 * Manages dependencies between tasks.
 * Automatically generates a command line interface.
 * Rake style param passing to tasks
@@ -145,7 +145,7 @@ Starting server at localhost:80
 [ example.py - Completed task "start_server" ]
 ```
 
-The first few characters of the task name is enough to execute the task, as long as the partial name is unambigious. You can specify multiple tasks to run in the commandline. Again the dependencies are taken taken care of.
+The first few characters of the task name is enough to execute the task, as long as the partial name is unambiguous. You can specify multiple tasks to run in the commandline. Again the dependencies are taken taken care of.
 
 ```bash
 $ pynt cle ht cl

@@ -8,6 +8,6 @@ __contact__ = "http://rags.github.com/pynt/"
 from ._pynt import chore, main
 import pkgutil
 
-__path__ = pkgutil.extend_path(__path__,__name__)
+__path__ = pkgutil.extend_path(__path__, __name__)
 
 __all__ = ["chore", "main"]

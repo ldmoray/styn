@@ -1,15 +1,15 @@
-`|Build Status| <https://travis-ci.org/rags/pynt>`_
+|Build Status|
 
 A pynt of Python build.
 =======================
 
-`Raghunandan Rao <https://github.com/rags>`_
+`Raghunandan Rao <https://github.com/rags>`__
 
 Features
 --------
 
 -  Easy to learn.
--  Build tasks are just python funtions.
+-  Build tasks are just python functions.
 -  Manages dependencies between tasks.
 -  Automatically generates a command line interface.
 -  Rake style param passing to tasks
@@ -23,13 +23,13 @@ source.
 
 Using pip
 
-::
+.. code:: bash
 
     $ pip install pynt
 
 Using easy\_install
 
-::
+.. code:: bash
 
     $ easy_install pynt
 
@@ -51,7 +51,7 @@ the dependency chains of all the dependent tasks.
 **build.py**
 ------------
 
-::
+.. code:: python
 
 
     #!/usr/bin/python
@@ -105,7 +105,7 @@ the dependency chains of all the dependent tasks.
 The command line interface and help is automatically generated. Task
 descriptions are extracted from function docstrings.
 
-::
+.. code:: bash
 
     $ pynt -h
     usage: pynt [-h] [-l] [-v] [-f file] [task [task ...]]
@@ -120,7 +120,7 @@ descriptions are extracted from function docstrings.
       -f file, --file file  Build file to read the tasks from. Default is
                             'build.py'
 
-::
+.. code:: bash
 
     $ pynt -l
     Tasks in build file ./build.py:
@@ -138,7 +138,7 @@ pynt takes care of dependencies between tasks. In the following case
 start\_server depends on clean, html and image generation (image task is
 ignored).
 
-::
+.. code:: bash
 
     $ pynt #Runs the default task start_server. It does exactly what "pynt start_server" would do.
     [ example.py - Starting task "clean" ]
@@ -153,11 +153,11 @@ ignored).
     [ example.py - Completed task "start_server" ]
 
 The first few characters of the task name is enough to execute the task,
-as long as the partial name is unambigious. You can specify multiple
+as long as the partial name is unambiguous. You can specify multiple
 tasks to run in the commandline. Again the dependencies are taken taken
 care of.
 
-::
+.. code:: bash
 
     $ pynt cle ht cl
     [ example.py - Starting task "clean" ]
@@ -175,7 +175,7 @@ explicitly run again later.
 
 pynt tasks can accept parameters from commandline.
 
-::
+.. code:: bash
 
     $ pynt "copy_file[/path/to/foo, path_to_bar]"
     [ example.py - Starting task "clean" ]
@@ -187,7 +187,7 @@ pynt tasks can accept parameters from commandline.
 
 pynt can also accept keyword arguments.
 
-::
+.. code:: bash
 
     $ pynt start[port=8888]
     [ example.py - Starting task "clean" ]
@@ -213,38 +213,45 @@ pynt can also accept keyword arguments.
 You can break up your build files into modules and simple import them
 into your main build file.
 
-::
+.. code:: python
 
     from deploy_tasks import *
     from test_tasks import functional_tests, report_coverage
+
+pynt-contrib
+------------
+
+`pynt-contrib <https://github.com/rags/pynt-contrib>`__ contains a set
+of extra tasks/utilities. The idea is to keep this package simple and
+bloat-free.
 
 Contributors/Contributing
 -------------------------
 
 -  Calum J. Eadie - pynt is preceded by and forked from
-   `microbuild <https://github.com/CalumJEadie/microbuild>`_, which was
-   created by `Calum J. Eadie <https://github.com/CalumJEadie>`_.
+   `microbuild <https://github.com/CalumJEadie/microbuild>`__, which was
+   created by `Calum J. Eadie <https://github.com/CalumJEadie>`__.
 
 If you want to make changes the repo is at https://github.com/rags/pynt.
-You will need `pytest <http://www.pytest.org>`_ to run the tests
+You will need `pytest <http://www.pytest.org>`__ to run the tests
 
-::
+.. code:: bash
 
     $ ./b t
 
 It will be great if you can raise a `pull
-request <https://help.github.com/articles/using-pull-requests>`_ once
+request <https://help.github.com/articles/using-pull-requests>`__ once
 you are done.
 
 *If you find any bugs or need new features please raise a ticket in the
-`issues section <https://github.com/rags/pynt/issues>`_ of the github
+`issues section <https://github.com/rags/pynt/issues>`__ of the github
 repo.*
 
 License
 -------
 
 pynt is licensed under a `MIT
-license <http://opensource.org/licenses/MIT>`_
+license <http://opensource.org/licenses/MIT>`__
 
-.. |Build
-Status| image:: https://travis-ci.org/rags/pynt.png?branch=master
+.. |Build Status| image:: https://travis-ci.org/rags/pynt.png?branch=master
+   :target: https://travis-ci.org/rags/pynt

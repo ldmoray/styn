@@ -1,3 +1,4 @@
+Copyright (C) 2016 Lenny Morayniss
 Copyright (C) 2012 Raghunandan Rao
 Copyright (C) 2012 Calum J. Eadie
 

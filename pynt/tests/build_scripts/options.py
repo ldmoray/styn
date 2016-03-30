@@ -1,17 +1,17 @@
-from pynt import task
+from pynt import chore
 
 tasks_run = []
 
-@task()
+@chore()
 def clean():
     tasks_run.append("clean")
 
-@task(clean)
+@chore(clean)
 def html():
     'Generate HTML.'
     tasks_run.append("html")
 
-@task(clean, ignore=True)
+@chore(clean, ignore=True)
 def images():
     """Prepare images.
 
@@ -19,7 +19,7 @@ def images():
 
     raise Exception("This task should have been ignored.")
 
-@task(clean,html,images)
+@chore(clean, html, images)
 def android():
     "Package Android app."
 

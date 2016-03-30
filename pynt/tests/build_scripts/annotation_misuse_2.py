@@ -1,6 +1,6 @@
-from pynt import task
+from pynt import chore
 
-@task()
+@chore()
 def clean():
     pass
     
@@ -9,6 +9,6 @@ def html():
     pass
 
 # References a non task.
-@task(clean,html)
+@chore(clean, html)
 def android():
     pass

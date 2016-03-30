@@ -209,7 +209,7 @@ def _create_parser():
         
 # Abbreviate for convenience.
 #task = _TaskDecorator
-def task(*dependencies, **options):
+def chore(*dependencies, **options):
     for i, dependency in enumerate(dependencies):
         if not Task.is_task(dependency):
                 if inspect.isfunction(dependency):

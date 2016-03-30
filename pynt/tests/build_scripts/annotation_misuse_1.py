@@ -1,6 +1,6 @@
-from pynt import task
+from pynt import chore
 
 # Uses @_pynt.task form instead of @_pynt.task() form.
-@task
+@chore
 def clean():
     pass

@@ -1,17 +1,17 @@
 """
 Build script with a runtime error.
 """
-from pynt import task
+from pynt import chore
 
 
-@task()
+@chore()
 def images():
     """Prepare images. Raises IOError."""
     global ran_images
     ran_images = True
     raise IOError
 
-@task(images)
+@chore(images)
 def android():
     """Package Android app."""
     global ran_android

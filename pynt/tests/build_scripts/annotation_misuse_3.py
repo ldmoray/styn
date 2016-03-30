@@ -1,10 +1,10 @@
-from pynt import task
+from pynt import chore
 
-@task()
+@chore()
 def clean():
     pass
     
 # Referring to clean by name rather than reference.
-@task(1234)
+@chore(1234)
 def html():
     pass

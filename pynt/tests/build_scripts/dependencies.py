@@ -1,31 +1,31 @@
-from pynt import task
+from pynt import chore
 
 
-@task()
+@chore()
 def clean():
     """Clean build directory."""
 
     print("clean")
 
-@task(clean)
+@chore(clean)
 def html():
     """Generate HTML."""
     
     print("html")
 
-@task(clean)
+@chore(clean)
 def images():
     """Prepare images."""
 
     print("images")
 
-@task(clean,html,images)
+@chore(clean, html, images)
 def android():
     """Package Android app."""
 
     print("android")
 
-@task(clean,html,images)
+@chore(clean, html, images)
 def ios():
     """Package iOS app."""
 

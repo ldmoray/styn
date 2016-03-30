@@ -1,43 +1,43 @@
 #!/usr/bin/python
 
-from pynt import task
+from pynt import chore
 
 tasks_run = []
     
-@task()
+@chore()
 def clean(directory='/tmp'):
     tasks_run.append('clean[%s]' % directory)
 
     
-@task(clean)
+@chore(clean)
 def html():
     tasks_run.append('html')
 
 
-@task()
+@chore()
 def tests(*test_names):
     tasks_run.append('tests[%s]' % ','.join(test_names))
 
 
-@task(clean)
+@chore(clean)
 def copy_file(from_, to, fail_on_error='True'):
     tasks_run.append('copy_file[%s,%s,%s]' % (from_, to, fail_on_error))
 
 
-@task(clean)
+@chore(clean)
 def start_server(port='80', debug='True'):
     tasks_run.append('start_server[%s,%s]' % (port, debug))
 
-@task(ignore=True)
+@chore(ignore=True)
 def ignored(file, contents):
     tasks_run.append('append_to_file[%s,%s]' % (file, contents))
 
-@task(clean, ignored)
+@chore(clean, ignored)
 def append_to_file(file, contents):
     tasks_run.append('append_to_file[%s,%s]' % (file, contents))
 
     
-@task(ignored)
+@chore(ignored)
 def echo(*args,**kwargs):
     args_str = []
     if args:

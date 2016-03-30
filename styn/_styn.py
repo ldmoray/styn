@@ -15,7 +15,7 @@ from styn import __version__
 
 _CREDIT_LINE = "Powered by styn %s - A Lightweight Python Build Tool for Celery Users." % __version__
 _LOGGING_FORMAT = "[ %(name)s - %(message)s ]"
-_TASK_PATTERN = re.compile("^([^\[]+)(\[([^\]]*)\])?$")
+_CHORE_PATTERN = re.compile("^([^\[]+)(\[([^\]]*)\])?$")
 # "^([^\[]+)(\[([^\],=]*(,[^\],=]+)*(,[^\],=]+=[^\],=]+)*)\])?$"
 
 
@@ -29,7 +29,7 @@ def build(args):
     parser = _create_parser()
 
     # No args passed.
-    # if not args: #todo: execute default task.
+    # if not args: #todo: execute default chore.
     #    parser.print_help()
     #    print("\n\n"+_CREDIT_LINE)
     #    exit
@@ -37,7 +37,7 @@ def build(args):
     args = parser.parse_args(args)
 
     if args.version:
-        print('pynt %s' % __version__)
+        print('styn %s' % __version__)
         sys.exit(0)
 
     # load build file as a module
@@ -48,92 +48,89 @@ def build(args):
 
     module = imp.load_source(path.splitext(path.basename(args.file))[0], args.file)
 
-    # Run task and all its dependencies.
-    if args.list_tasks:
-        print_tasks(module, args.file)
-    elif not args.tasks:
-        if not _run_default_task(module):
+    # Run chore and all its dependencies.
+    if args.list_chores:
+        print_chores(module, args.file)
+    elif not args.chores:
+        if not _run_default_chore(module):
             parser.print_help()
             print("\n")
-            print_tasks(module, args.file)
+            print_chores(module, args.file)
     else:
-        _run_from_task_names(module, args.tasks)
+        _run_from_chore_names(module, args.chores)
 
 
-def print_tasks(module, build_file):
-    # Get all tasks.
-    tasks = _get_tasks(module)
+def print_chores(module, build_file):
+    # Get all chores.
+    chores = _get_chores(module)
 
-    # Build task_list to describe the tasks.
-    task_list = "Tasks in build build_file %s:" % build_file
+    # Build chore_list to describe the chores.
+    chore_list = "Chores in build build_file %s:" % build_file
     name_width = _get_max_name_length(module) + 4
-    task_help_format = "\n  {0:<%s} {1: ^10} {2}" % name_width
-    default = _get_default_task(module)
-    for task in sorted(tasks, key=lambda task: task.name):
+    chore_help_format = "\n  {0:<%s} {1: ^10} {2}" % name_width
+    default = _get_default_chore(module)
+    for chore in sorted(chores, key=lambda chore: chore.name):
         attributes = []
-        if task.ignored:
+        if chore.ignored:
             attributes.append('Ignored')
-        if default and task.name == default.name:
+        if default and chore.name == default.name:
             attributes.append('Default')
 
-        task_list += task_help_format.format(task.name,
-                                             ('[' + ', '.join(attributes) + ']')
-                                             if attributes else '',
-                                             task.doc)
-    print(task_list + "\n\n" + _CREDIT_LINE)
+        chore_list += chore_help_format.format(chore.name,
+                                               ('[' + ', '.join(attributes) + ']')
+                                               if attributes else '',
+                                               chore.doc)
+    print(chore_list + "\n\n" + _CREDIT_LINE)
 
 
-def _get_default_task(module):
-    matching_tasks = [task for name, task in inspect.getmembers(module, Task.is_task)
-                      if name == "__DEFAULT__"]
-    if matching_tasks:
-        return matching_tasks[0]
+def _get_default_chore(module):
+    matching_chores = [chore for name, chore in inspect.getmembers(module, Chore.is_chore) if name == "__DEFAULT__"]
+    if matching_chores:
+        return matching_chores[0]
 
 
-def _run_default_task(module):
-    default_task = _get_default_task(module)
-    if not default_task:
+def _run_default_chore(module):
+    default_chore = _get_default_chore(module)
+    if not default_chore:
         return False
-    _run(module, _get_logger(module), default_task, set())
+    _run(module, _get_logger(module), default_chore, set())
     return True
 
 
-def _run_from_task_names(module, task_names):
+def _run_from_chore_names(module, chore_names):
     """
     @type module: module
-    @type task_names: list string
-    @param task_names: Task names, exactly corresponds to function name.
+    @type chore_names: list string
+    @param chore_names: Chore names, exactly corresponds to function name.
     """
     # Create logger.
     logger = _get_logger(module)
-    all_tasks = _get_tasks(module)
+    all_tasks = _get_chores(module)
     completed_tasks = set([])
-    for task_name in task_names:
-        task, args, kwargs = _get_task(module, task_name, all_tasks)
-        _run(module, logger, task, completed_tasks, True, args, kwargs)
+    for chore_name in chore_names:
+        chore, args, kwargs = _get_chore(module, chore_name, all_tasks)
+        _run(module, logger, chore, completed_tasks, True, args, kwargs)
 
 
-def _get_task(module, name, tasks):
-    # Get all tasks.
-    match = _TASK_PATTERN.match(name)
+def _get_chore(module, name, chores):
+    # Get all chores.
+    match = _CHORE_PATTERN.match(name)
     if not match:
-        raise Exception("Invalid task argument %s" % name)
-    task_name, _, args_str = match.groups()
+        raise Exception("Invalid chore argument %s" % name)
+    chore_name, _, args_str = match.groups()
 
     args, kwargs = _parse_args(args_str)
-    if hasattr(module, task_name):
-        return getattr(module, task_name), args, kwargs
-    matching_tasks = [task for task in tasks if task.name.startswith(task_name)]
+    if hasattr(module, chore_name):
+        return getattr(module, chore_name), args, kwargs
+    matching_chores = [chore for chore in chores if chore.name.startswith(chore_name)]
 
-    if not matching_tasks:
-        raise Exception("Invalid task '%s'. Task should be one of %s" %
-                        (name,
-                         ', '.join([task.name for task in tasks])))
-    if len(matching_tasks) == 1:
-        return matching_tasks[0], args, kwargs
-    raise Exception("Conflicting matches %s for task %s" % (
-        ', '.join([task.name for task in matching_tasks]), task_name
-    ))
+    if not matching_chores:
+        raise Exception("Invalid chore '%s'. Chore should be one of %s" %
+                        (name, ', '.join([chore.name for chore in chores])))
+    if len(matching_chores) == 1:
+        return matching_chores[0], args, kwargs
+    raise Exception("Conflicting matches %s for chore %s" %
+                    (', '.join([chore.name for chore in matching_chores]), chore_name))
 
 
 def _parse_args(args_str):
@@ -157,44 +154,44 @@ def _parse_args(args_str):
     return args, kwargs
 
 
-def _run(module, logger, task, completed_tasks, from_command_line=False, args=None, kwargs=None):
+def _run(module, logger, chore, completed_chores, from_command_line=False, args=None, kwargs=None):
     """
     @type module: module
     @type logger: Logger
-    @type task: Task
-    @type completed_tasks: set Task
-    @rtype: set Task
+    @type chore: Chore
+    @type completed_chores: set Chore
+    @rtype: set Chore
     @return: Updated set of completed tasks after satisfying all dependencies.
     """
     # Satisfy dependencies recursively. Maintain set of completed tasks so each
-    # task is only performed once.
-    for dependency in task.dependencies:
-        completed_tasks = _run(module, logger, dependency, completed_tasks)
+    # chore is only performed once.
+    for dependency in chore.dependencies:
+        completed_chores = _run(module, logger, dependency, completed_chores)
 
-    # Perform current task, if need to.
-    if from_command_line or task not in completed_tasks:
+    # Perform current chore, if need to.
+    if from_command_line or chore not in completed_chores:
 
-        if task.ignored:
+        if chore.ignored:
 
-            logger.info("Ignoring task \"%s\"" % task.name)
+            logger.info("Ignoring chore \"%s\"" % chore.name)
 
         else:
 
-            logger.info("Starting task \"%s\"" % task.name)
+            logger.info("Starting chore \"%s\"" % chore.name)
 
             try:
-                # Run task.
-                task(*(args or []), **(kwargs or {}))
+                # Run chore.
+                chore(*(args or []), **(kwargs or {}))
             except:
-                logger.critical("Error in task \"%s\"" % task.name)
+                logger.critical("Error in chore \"%s\"" % chore.name)
                 logger.critical("Aborting build")
                 raise
 
-            logger.info("Completed task \"%s\"" % task.name)
+            logger.info("Completed chore \"%s\"" % chore.name)
 
-        completed_tasks.add(task)
+        completed_chores.add(chore)
 
-    return completed_tasks
+    return completed_chores
 
 
 def _create_parser():
@@ -202,45 +199,45 @@ def _create_parser():
     @rtype: argparse.ArgumentParser
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("tasks", help="perform specified task and all its dependencies",
-                        metavar="task", nargs='*')
-    parser.add_argument('-l', '--list-tasks', help="List the tasks",
+    parser.add_argument("chores", help="perform specified chore and all its dependencies",
+                        metavar="chore", nargs='*')
+    parser.add_argument('-l', '--list-chores', help="List the chores",
                         action='store_true')
     parser.add_argument('-v', '--version',
                         help="Display the version information",
                         action='store_true')
     parser.add_argument('-f', '--file',
-                        help="Build file to read the tasks from. 'build.py' is default value assumed if this argument is unspecified",
+                        help="Build file to read the chores from. 'build.py' is default value assumed if this argument is unspecified",
                         metavar="file", default="build.py")
 
     return parser
 
 
 # Abbreviate for convenience.
-# task = _TaskDecorator
+# chore = _TaskDecorator
 def chore(*dependencies, **options):
     for i, dependency in enumerate(dependencies):
-        if not Task.is_task(dependency):
+        if not Chore.is_chore(dependency):
             if inspect.isfunction(dependency):
                 # Throw error specific to the most likely form of misuse.
                 if i == 0:
-                    raise Exception("Replace use of @task with @task().")
+                    raise Exception("Replace use of @chore with @chore().")
                 else:
-                    raise Exception("%s is not a task. Each dependency should be a task." % dependency)
+                    raise Exception("%s is not a chore. Each dependency should be a chore." % dependency)
             else:
-                raise Exception("%s is not a task." % dependency)
+                raise Exception("%s is not a chore." % dependency)
 
     def decorator(fn):
-        return Task(fn, dependencies, options)
+        return Chore(fn, dependencies, options)
 
     return decorator
 
 
-class Task(object):
+class Chore(object):
     def __init__(self, func, dependencies, options):
         """
         @type func: 0-ary function
-        @type dependencies: list of Task objects
+        @type dependencies: list of Chore objects
         """
         self.func = func
         self.name = func.__name__
@@ -252,32 +249,32 @@ class Task(object):
         self.func.__call__(*args, **kwargs)
 
     @classmethod
-    def is_task(cls, obj):
+    def is_chore(cls, obj):
         """
-        Returns true if an object is a build task.
+        Returns true if an object is a build chore.
         @type obj: Object
         """
         return isinstance(obj, cls)
 
 
-def _get_tasks(module):
+def _get_chores(module):
     """
     Returns all functions marked as tasks.
     
     @type module: module
     """
-    # Get all functions that are marked as task and pull out the task object
+    # Get all functions that are marked as chores and pull out the chore object
     # from each (name,value) pair.
-    return set(member[1] for member in inspect.getmembers(module, Task.is_task))
+    return set(member[1] for member in inspect.getmembers(module, Chore.is_chore))
 
 
 def _get_max_name_length(module):
     """
-    Returns the length of the longest task name.
+    Returns the length of the longest chore name.
     
     @type module: module
     """
-    return max([len(task.name) for task in _get_tasks(module)])
+    return max([len(chore.name) for chore in _get_chores(module)])
 
 
 def _get_logger(module):

@@ -24,27 +24,27 @@ def simulate_dynamic_module_load(mod):
 
 
 def reset_build_file(mod):
-    mod.tasks_run = []
+    mod.chores_run = []
 
 
 def build(mod, params=None, init_mod=reset_build_file):
     dynamically_loaded_mod = simulate_dynamic_module_load(mod)
-    dynamically_loaded_mod.tasks_run = []
-    sys.argv = ['pynt', '-f', fpath(mod)] + (params or [])
+    dynamically_loaded_mod.chores_run = []
+    sys.argv = ['styn', '-f', fpath(mod)] + (params or [])
     main()
     return dynamically_loaded_mod
 
 
 class TestParseArgs:
     def test_parsing_commandline(self):
-        args = _styn._create_parser().parse_args(['-f', "foo.py", "task1", "task2"])
+        args = _styn._create_parser().parse_args(['-f', "foo.py", "chore1", "chore2"])
         assert "foo.py" == args.file
-        assert not args.list_tasks
-        assert ['task1', 'task2'] == args.tasks
+        assert not args.list_chores
+        assert ['chore1', 'chore2'] == args.chores
 
     def test_parsing_commandline_help(self):
-        assert _styn._create_parser().parse_args(["-l"]).list_tasks
-        assert _styn._create_parser().parse_args(["--list-tasks"]).list_tasks
+        assert _styn._create_parser().parse_args(["-l"]).list_chores
+        assert _styn._create_parser().parse_args(["--list-chores"]).list_chores
 
     def test_parsing_commandline_build_file(self):
         assert "some_file" == _styn._create_parser().parse_args(["-f", "some_file"]).file
@@ -58,56 +58,56 @@ class TestParseArgs:
 
 
 class TestBuildSimple:
-    def test_get_tasks(self):
+    def test_get_chores(self):
         from .build_scripts import simple
-        ts = _styn._get_tasks(simple)
+        ts = _styn._get_chores(simple)
         assert len(ts) == 5
 
 
 class TestBuildWithDependencies:
-    def test_get_tasks(self):
+    def test_get_chores(self):
         from .build_scripts import dependencies
-        tasks = _styn._get_tasks(dependencies)
-        assert len(tasks) == 5
-        assert 3 == len([task for task in tasks if task.name == 'android'][0].dependencies)
-        assert 3 == len([task for task in tasks if task.name == 'ios'][0].dependencies)
+        chores = _styn._get_chores(dependencies)
+        assert len(chores) == 5
+        assert 3 == len([chore for chore in chores if chore.name == 'android'][0].dependencies)
+        assert 3 == len([chore for chore in chores if chore.name == 'ios'][0].dependencies)
 
     def test_dependencies_for_imported(self):
-        from .build_scripts import default_task_and_import_dependencies
-        tasks = _styn._get_tasks(default_task_and_import_dependencies)
-        assert 7 == len(tasks)
-        assert [task for task in tasks if task.name == 'clean']
-        assert [task for task in tasks if task.name == 'local_task']
-        assert [task for task in tasks if task.name == 'android']
-        assert 3 == len([task for task in tasks if task.name == 'task_with_imported_dependencies'][0].dependencies)
+        from .build_scripts import default_chore_and_import_dependencies
+        chores = _styn._get_chores(default_chore_and_import_dependencies)
+        assert 7 == len(chores)
+        assert [chore for chore in chores if chore.name == 'clean']
+        assert [chore for chore in chores if chore.name == 'local_chore']
+        assert [chore for chore in chores if chore.name == 'android']
+        assert 3 == len([chore for chore in chores if chore.name == 'chore_with_imported_dependencies'][0].dependencies)
 
     def test_dependencies_that_are_imported_e2e(self):
-        from .build_scripts import default_task_and_import_dependencies
+        from .build_scripts import default_chore_and_import_dependencies
 
         def mod_init(mod):
-            mod.tasks_run = []
-            mod.build_with_params.tasks_run = []
+            mod.chores_run = []
+            mod.build_with_params.chores_run = []
 
-        module = build(default_task_and_import_dependencies, ["task_with_imported_dependencies"], init_mod=mod_init)
-        assert module.tasks_run == ['local_task', 'task_with_imported_dependencies']
-        assert module.build_with_params.tasks_run == ['clean[/tmp]', 'html']
+        module = build(default_chore_and_import_dependencies, ["chore_with_imported_dependencies"], init_mod=mod_init)
+        assert module.chores_run == ['local_chore', 'chore_with_imported_dependencies']
+        assert module.build_with_params.chores_run == ['clean[/tmp]', 'html']
 
 
 class TestDecorationValidation:
-    def test_task_without_braces(self):
+    def test_chore_without_braces(self):
         with pytest.raises(Exception) as exc:
             from .build_scripts import annotation_misuse_1
-        assert 'Replace use of @task with @task().' in str(exc.value)
+        assert 'Replace use of @chore with @chore().' in str(exc.value)
 
-    def test_dependency_not_a_task(self):
+    def test_dependency_not_a_chore(self):
         with pytest.raises(Exception) as exc:
             from .build_scripts import annotation_misuse_2
-        assert re.findall('function html.* is not a task.', str(exc.value))
+        assert re.findall('function html.* is not a chore.', str(exc.value))
 
     def test_dependency_not_a_function(self):
         with pytest.raises(Exception) as exc:
             from .build_scripts import annotation_misuse_3
-        assert '1234 is not a task.' in str(exc.value)
+        assert '1234 is not a chore.' in str(exc.value)
 
 
 @contextlib.contextmanager
@@ -132,29 +132,29 @@ class TestOptions:
                      'android': 'Package Android app.'}
         return module
 
-    def test_ignore_tasks(self, module):
+    def test_ignore_chores(self, module):
         module = build(module, ["android"])
-        assert ['clean', 'html', 'android'] == module.tasks_run
+        assert ['clean', 'html', 'android'] == module.chores_run
 
     def test_docs(self, module):
-        tasks = _styn._get_tasks(module)
-        assert 4 == len(tasks)
+        chores = _styn._get_chores(module)
+        assert 4 == len(chores)
 
-        for task_ in tasks:
-            assert task_.name in self.docs
-            assert self.docs[task_.name] == task_.doc
+        for chore_ in chores:
+            assert chore_.name in self.docs
+            assert self.docs[chore_.name] == chore_.doc
 
-    @pytest.mark.parametrize('args', [['-l'], ['--list-tasks'], []])
+    @pytest.mark.parametrize('args', [['-l'], ['--list-chores'], []])
     def test_list_docs(self, module, args):
         with mock_stdout() as out:
             build(module, args)
         stdout = out[0]
-        tasks = _styn._get_tasks(module)
-        for task in tasks:
-            if task.ignored:
-                assert re.findall('%s\s+%s\s+%s' % (task.name, "\[Ignored\]", task.doc), stdout)
+        chores = _styn._get_chores(module)
+        for chore in chores:
+            if chore.ignored:
+                assert re.findall('%s\s+%s\s+%s' % (chore.name, "\[Ignored\]", chore.doc), stdout)
             else:
-                assert re.findall('%s\s+%s' % (task.name, task.doc), stdout)
+                assert re.findall('%s\s+%s' % (chore.name, chore.doc), stdout)
 
 
 class TestRuntimeError:
@@ -166,64 +166,64 @@ class TestRuntimeError:
         assert mod.ran_images
         assert not hasattr(mod, 'ran_android')
 
-    def test_exception_on_invalid_task_name(self):
+    def test_exception_on_invalid_chore_name(self):
         from .build_scripts import build_with_params
         with pytest.raises(Exception) as exc:
             build(build_with_params, ["doesnt_exist"])
 
-            assert 'task should be one of append_to_file, clean' \
+            assert 'chore should be one of append_to_file, clean' \
                    ', copy_file, echo, html, start_server, tests' in str(exc.value)
 
 
-class TestPartialTaskNames:
+class TestPartialChoreNames:
     def setup_method(self, method):
         from .build_scripts import build_with_params
         self._mod = build_with_params
 
     def test_with_partial_name(self):
         mod = build(self._mod, ["cl"])
-        assert ['clean[/tmp]'] == mod.tasks_run
+        assert ['clean[/tmp]'] == mod.chores_run
 
     def test_with_partial_name_and_dependencies(self):
         mod = build(self._mod, ["htm"])
-        assert ['clean[/tmp]', 'html'] == mod.tasks_run
+        assert ['clean[/tmp]', 'html'] == mod.chores_run
 
     def test_exception_on_conflicting_partial_names(self):
         with pytest.raises(Exception) as exc:
             build(self._mod, ["c"])
-        assert ('Conflicting matches clean, copy_file for task c' in str(exc.value) or
-                'Conflicting matches copy_file, clean for task c' in str(exc.value))
+        assert ('Conflicting matches clean, copy_file for chore c' in str(exc.value) or
+                'Conflicting matches copy_file, clean for chore c' in str(exc.value))
 
 
-class TestDefaultTask:
-    def test_simple_default_task(self):
+class TestDefaultChore:
+    def test_simple_default_chore(self):
         from .build_scripts import simple
-        assert _styn._run_default_task(simple)  # returns false if no default task
+        assert _styn._run_default_chore(simple)  # returns false if no default chore
 
     def test_module_with_defaults_which_imports_other_files_with_defaults(self):
-        from .build_scripts import default_task_and_import_dependencies
-        mod = build(default_task_and_import_dependencies)
-        assert 'task_with_imported_dependencies' in mod.tasks_run
+        from .build_scripts import default_chore_and_import_dependencies
+        mod = build(default_chore_and_import_dependencies)
+        assert 'chore_with_imported_dependencies' in mod.chores_run
 
 
-class TestMultipleTasks:
+class TestMultipleChores:
     def setup_method(self, method):
         from .build_scripts import build_with_params
         self._mod = build_with_params
 
     def test_dependency_is_run_only_once_unless_explicitly_invoked_again(self):
         mod = build(self._mod, ["clean", "html", 'tests', "clean"])
-        assert ['clean[/tmp]', "html", "tests[]", "clean[/tmp]"] == mod.tasks_run
+        assert ['clean[/tmp]', "html", "tests[]", "clean[/tmp]"] == mod.chores_run
 
     def test_multiple_partial_names(self):
-        assert ['clean[/tmp]', "html"] == build(self._mod, ["cl", "htm"]).tasks_run
+        assert ['clean[/tmp]', "html"] == build(self._mod, ["cl", "htm"]).chores_run
 
 
-class TestTaskArguments:
+class TestChoreArguments:
     def setup_method(self, method):
         from .build_scripts import build_with_params
         self._mod = build_with_params
-        self._mod.tasks_run = []
+        self._mod.chores_run = []
 
     def test_passing_optional_params_with_dependencies(self):
         mod = build(self._mod, ["clean[~/project/foo]",
@@ -232,26 +232,26 @@ class TestTaskArguments:
                                 'start_server[8080]'])
         assert ["clean[~/project/foo]", 'append_to_file[/foo/bar,ABCDEF]',
                 "copy_file[/foo/bar,/foo/blah,False]", 'start_server[8080,True]'
-                ] == mod.tasks_run
+                ] == mod.chores_run
 
-    def test_invoking_varargs_task(self):
+    def test_invoking_varargs_chore(self):
         mod = build(self._mod, ['tests[test1,test2,test3]'])
-        assert ['tests[test1,test2,test3]'] == mod.tasks_run
+        assert ['tests[test1,test2,test3]'] == mod.chores_run
 
     def test_partial_name_with_args(self):
         mod = build(self._mod, ['co[foo,bar]', 'star'])
-        assert ['clean[/tmp]', 'copy_file[foo,bar,True]', 'start_server[80,True]'] == mod.tasks_run
+        assert ['clean[/tmp]', 'copy_file[foo,bar,True]', 'start_server[80,True]'] == mod.chores_run
 
     def test_passing_keyword_args(self):
         mod = build(self._mod, ['co[to=bar,from_=foo]', 'star[80,debug=False]', 'echo[foo=bar,blah=123]'])
 
         assert ['clean[/tmp]', 'copy_file[foo,bar,True]',
                 'start_server[80,False]',
-                'echo[blah=123,foo=bar]'] == mod.tasks_run
+                'echo[blah=123,foo=bar]'] == mod.chores_run
 
     def test_passing_varargs_and_keyword_args(self):
         assert (['echo[1,2,3,some_str,111=333,bar=123.3,foo=xyz]'] ==
-                build(self._mod, ['echo[1,2,3,some_str,111=333,foo=xyz,bar=123.3]']).tasks_run)
+                build(self._mod, ['echo[1,2,3,some_str,111=333,foo=xyz,bar=123.3]']).chores_run)
 
     def test_validate_keyword_arguments_always_after_args(self):
         with pytest.raises(Exception) as exc:

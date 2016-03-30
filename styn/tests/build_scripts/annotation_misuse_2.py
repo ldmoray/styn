@@ -6,12 +6,12 @@ def clean():
     pass
 
 
-# Should be marked as task.
+# Should be marked as chore.
 def html():
     pass
 
 
-# References a non task.
+# References a non chore.
 @chore(clean, html)
 def android():
     pass

@@ -1,7 +1,7 @@
 """
 Build script with a runtime error.
 """
-from pynt import chore
+from styn import chore
 
 
 @chore()

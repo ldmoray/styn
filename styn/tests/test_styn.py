@@ -10,7 +10,7 @@ else:
     from StringIO import StringIO as SOut
 
 from os import path
-from pynt import _pynt, main
+from styn import _styn, main
 
 
 def fpath(mod):
@@ -37,44 +37,44 @@ def build(mod, params=None, init_mod=reset_build_file):
 
 class TestParseArgs:
     def test_parsing_commandline(self):
-        args = _pynt._create_parser().parse_args(['-f', "foo.py", "task1", "task2"])
+        args = _styn._create_parser().parse_args(['-f', "foo.py", "task1", "task2"])
         assert "foo.py" == args.file
         assert not args.list_tasks
         assert ['task1', 'task2'] == args.tasks
 
     def test_parsing_commandline_help(self):
-        assert _pynt._create_parser().parse_args(["-l"]).list_tasks
-        assert _pynt._create_parser().parse_args(["--list-tasks"]).list_tasks
+        assert _styn._create_parser().parse_args(["-l"]).list_tasks
+        assert _styn._create_parser().parse_args(["--list-tasks"]).list_tasks
 
     def test_parsing_commandline_build_file(self):
-        assert "some_file" == _pynt._create_parser().parse_args(["-f", "some_file"]).file
-        assert "build.py" == _pynt._create_parser().parse_args([]).file
-        assert "/foo/bar" == _pynt._create_parser().parse_args(["--file", "/foo/bar"]).file
+        assert "some_file" == _styn._create_parser().parse_args(["-f", "some_file"]).file
+        assert "build.py" == _styn._create_parser().parse_args([]).file
+        assert "/foo/bar" == _styn._create_parser().parse_args(["--file", "/foo/bar"]).file
 
         with pytest.raises(SystemExit):
-            _pynt._create_parser().parse_args(["--file"])
+            _styn._create_parser().parse_args(["--file"])
         with pytest.raises(SystemExit):
-            _pynt._create_parser().parse_args(["-f"])
+            _styn._create_parser().parse_args(["-f"])
 
 
 class TestBuildSimple:
     def test_get_tasks(self):
         from .build_scripts import simple
-        ts = _pynt._get_tasks(simple)
+        ts = _styn._get_tasks(simple)
         assert len(ts) == 5
 
 
 class TestBuildWithDependencies:
     def test_get_tasks(self):
         from .build_scripts import dependencies
-        tasks = _pynt._get_tasks(dependencies)
+        tasks = _styn._get_tasks(dependencies)
         assert len(tasks) == 5
         assert 3 == len([task for task in tasks if task.name == 'android'][0].dependencies)
         assert 3 == len([task for task in tasks if task.name == 'ios'][0].dependencies)
 
     def test_dependencies_for_imported(self):
         from .build_scripts import default_task_and_import_dependencies
-        tasks = _pynt._get_tasks(default_task_and_import_dependencies)
+        tasks = _styn._get_tasks(default_task_and_import_dependencies)
         assert 7 == len(tasks)
         assert [task for task in tasks if task.name == 'clean']
         assert [task for task in tasks if task.name == 'local_task']
@@ -137,7 +137,7 @@ class TestOptions:
         assert ['clean', 'html', 'android'] == module.tasks_run
 
     def test_docs(self, module):
-        tasks = _pynt._get_tasks(module)
+        tasks = _styn._get_tasks(module)
         assert 4 == len(tasks)
 
         for task_ in tasks:
@@ -149,7 +149,7 @@ class TestOptions:
         with mock_stdout() as out:
             build(module, args)
         stdout = out[0]
-        tasks = _pynt._get_tasks(module)
+        tasks = _styn._get_tasks(module)
         for task in tasks:
             if task.ignored:
                 assert re.findall('%s\s+%s\s+%s' % (task.name, "\[Ignored\]", task.doc), stdout)
@@ -198,7 +198,7 @@ class TestPartialTaskNames:
 class TestDefaultTask:
     def test_simple_default_task(self):
         from .build_scripts import simple
-        assert _pynt._run_default_task(simple)  # returns false if no default task
+        assert _styn._run_default_task(simple)  # returns false if no default task
 
     def test_module_with_defaults_which_imports_other_files_with_defaults(self):
         from .build_scripts import default_task_and_import_dependencies

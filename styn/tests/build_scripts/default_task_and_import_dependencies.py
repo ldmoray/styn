@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-from pynt.tests.build_scripts.simple import *
-from pynt.tests.build_scripts import build_with_params
+from styn.tests.build_scripts.simple import *
+from styn.tests.build_scripts import build_with_params
 
 tasks_run = []
 

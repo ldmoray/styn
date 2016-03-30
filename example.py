@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from pynt import chore
+from styn import chore
 
 
 @chore()

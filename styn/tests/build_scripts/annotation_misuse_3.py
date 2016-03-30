@@ -1,4 +1,4 @@
-from pynt import chore
+from styn import chore
 
 
 @chore()

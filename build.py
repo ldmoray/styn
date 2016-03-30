@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import subprocess
-from pynt import chore
+from styn import chore
 
 
 @chore()

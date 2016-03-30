@@ -1,4 +1,4 @@
-from pynt import chore
+from styn import chore
 
 
 # Uses @_pynt.task form instead of @_pynt.task() form.

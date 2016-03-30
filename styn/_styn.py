@@ -11,7 +11,7 @@ from os import path
 import re
 import imp
 import sys
-from pynt import __version__
+from styn import __version__
 
 _CREDIT_LINE = "Powered by pynt %s - A Lightweight Python Build Tool." % __version__
 _LOGGING_FORMAT = "[ %(name)s - %(message)s ]"

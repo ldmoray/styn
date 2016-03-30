@@ -216,7 +216,7 @@ from test_tasks import functional_tests, report_coverage
 * Calum J. Eadie - pynt is preceded by and forked from [microbuild](https://github.com/CalumJEadie/microbuild), which was created by [Calum J. Eadie](https://github.com/CalumJEadie).
 
 
-If you want to make changes the repo is at https://github.com/rags/styn. You will need [pytest](http://www.pytest.org) to run the tests
+If you want to make changes the repo is at https://github.com/ldmoray/styn. You will need [pytest](http://www.pytest.org) to run the tests
 
 ```bash
 $ ./b t

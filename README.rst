@@ -230,8 +230,9 @@ Contributors/Contributing
    `microbuild <https://github.com/CalumJEadie/microbuild>`__, which was
    created by `Calum J. Eadie <https://github.com/CalumJEadie>`__.
 
-If you want to make changes the repo is at https://github.com/rags/styn.
-You will need `pytest <http://www.pytest.org>`__ to run the tests
+If you want to make changes the repo is at
+https://github.com/ldmoray/styn. You will need
+`pytest <http://www.pytest.org>`__ to run the tests
 
 .. code:: bash
 

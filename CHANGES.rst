@@ -1,5 +1,13 @@
 Changes 
 =======
+1.0.0 - 30/03/2016
+------------------
+* Rename task decorator to chore
+* Use default "py.test" to test. Only test one version.
+
+Changes before forking from pynt
+================================
+
 0.8.1 - 02/09/2013
 ------------------
 * Enabling extensions

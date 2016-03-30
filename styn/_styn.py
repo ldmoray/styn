@@ -1,5 +1,5 @@
 """
-Lightweight Python Build Tool
+Lightweight Python Build Tool for Celery Users
 
 """
 
@@ -13,11 +13,9 @@ import imp
 import sys
 from styn import __version__
 
-_CREDIT_LINE = "Powered by pynt %s - A Lightweight Python Build Tool." % __version__
+_CREDIT_LINE = "Powered by styn %s - A Lightweight Python Build Tool for Celery Users." % __version__
 _LOGGING_FORMAT = "[ %(name)s - %(message)s ]"
 _TASK_PATTERN = re.compile("^([^\[]+)(\[([^\]]*)\])?$")
-
-
 # "^([^\[]+)(\[([^\],=]*(,[^\],=]+)*(,[^\],=]+=[^\],=]+)*)\])?$"
 
 

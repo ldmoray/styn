@@ -10,7 +10,7 @@ setup(
     packages=["styn"],
     entry_points={'console_scripts': ['styn=styn:main']},
     license="MIT License",
-    description="Lightweight Python Build Tool.",
+    description="Lightweight Python Build Tool for Celery Users.",
     long_description=open("README.rst").read() + "\n" + open("CHANGES.rst").read(),
     requires=['pytest']
 )

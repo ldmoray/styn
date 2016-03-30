@@ -2,7 +2,7 @@ Changes
 =======
 1.0.0 - 30/03/2016
 ------------------
-* Rename task decorator to chore
+* Rename task decorator to chore to work with Celery.
 * Use default "py.test" to test. Only test one version.
 
 Changes before forking from pynt

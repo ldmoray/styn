@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/rags/pynt.png?branch=master)](https://travis-ci.org/rags/pynt)
+[![Build Status](https://travis-ci.org/ldmoray/styn.svg?branch=master)](https://travis-ci.org/ldmoray/styn)
 
-A pynt of Python build. 
+A styn of Python build. 
 =============================
 
-[Raghunandan Rao](https://github.com/rags)
+[Lenny Morayniss](https://github.com/ldmoray)
 
 ## Features
 
@@ -13,28 +13,30 @@ A pynt of Python build.
 * Automatically generates a command line interface.
 * Rake style param passing to tasks
 * Supports python 2.7 and python 3.x
+* Tasks are called chores.
+* Works with Celery.
 
 ## Installation
 
 
-You can install pynt from the Python Package Index (PyPI) or from source.
+You can install styn from the Python Package Index (PyPI) or from source.
 
 Using pip
 
 ```bash
-$ pip install pynt
+$ pip install styn
 ```
 
 Using easy_install
 
 ```bash
-$ easy_install pynt
+$ easy_install styn
 ```
 
 ## Example
 
 
-The build script is written in pure Python and pynt takes care of managing
+The build script is written in pure Python and styn takes care of managing
 any dependencies between tasks and generating a command line interface.
 
 Writing build tasks is really simple, all you need to know is the @task decorator. Tasks are just regular Python 
@@ -51,37 +53,37 @@ dependent tasks.
 #!/usr/bin/python
 
 import sys
-from pynt import task
+from styn import chore
 
-@task()
+@chore()
 def clean():
     '''Clean build directory.'''
     print 'Cleaning build directory...'
 
-@task(clean)
+@chore(clean)
 def html(target='.'):
     '''Generate HTML.'''
     print 'Generating HTML in directory "%s"' %  target
 
-@task(clean, ignore=True)
+@chore(clean, ignore=True)
 def images():
     '''Prepare images.'''
     print 'Preparing images...'
 
-@task(html,images)
+@chore(html,images)
 def start_server(server='localhost', port = '80'):
     '''Start the server'''
     print 'Starting server at %s:%s' % (server, port)
 
-@task(start_server) #Depends on task with all optional params
+@chore(start_server) #Depends on task with all optional params
 def stop_server():
     print 'Stopping server....'
 
-@task()
+@chore()
 def copy_file(src, dest):
     print 'Copying from %s to %s' % (src, dest)
 
-@task()
+@chore()
 def echo(*args,**kwargs):
     print args
     print kwargs
@@ -94,15 +96,15 @@ def echo(*args,**kwargs):
 __DEFAULT__=start_server
 ```
 
-**Running pynt tasks**
+**Running styn chores**
 -----------------------
 
 The command line interface and help is automatically generated. Task descriptions
 are extracted from function docstrings.
 
 ```bash
-$ pynt -h
-usage: pynt [-h] [-l] [-v] [-f file] [task [task ...]]
+$ styn -h
+usage: styn [-h] [-l] [-v] [-f file] [task [task ...]]
 
 positional arguments:
   task                  perform specified task and all its dependencies
@@ -116,7 +118,7 @@ optional arguments:
 ```
 
 ```bash
-$ pynt -l
+$ styn -l
 Tasks in build file ./build.py:
   clean                       Clean build directory.
   copy_file                   
@@ -126,13 +128,13 @@ Tasks in build file ./build.py:
   start_server     [Default]  Start the server
   stop_server                 
 
-Powered by pynt - A Lightweight Python Build Tool.
+Powered by styn - A Lightweight Python Build Tool for Celery Users.
 ```
           
-pynt takes care of dependencies between tasks. In the following case start_server depends on clean, html and image generation (image task is ignored).
+styn takes care of dependencies between tasks. In the following case start_server depends on clean, html and image generation (image task is ignored).
 
 ```bash
-$ pynt #Runs the default task start_server. It does exactly what "pynt start_server" would do.
+$ styn #Runs the default task start_server. It does exactly what "styn start_server" would do.
 [ example.py - Starting task "clean" ]
 Cleaning build directory...
 [ example.py - Completed task "clean" ]
@@ -148,7 +150,7 @@ Starting server at localhost:80
 The first few characters of the task name is enough to execute the task, as long as the partial name is unambiguous. You can specify multiple tasks to run in the commandline. Again the dependencies are taken taken care of.
 
 ```bash
-$ pynt cle ht cl
+$ styn cle ht cl
 [ example.py - Starting task "clean" ]
 Cleaning build directory...
 [ example.py - Completed task "clean" ]
@@ -162,10 +164,10 @@ Cleaning build directory...
 
 The 'html' task dependency 'clean' is run only once. But clean can be explicitly run again later.
 
-pynt tasks can accept parameters from commandline.
+styn tasks can accept parameters from commandline.
 
 ```bash
-$ pynt "copy_file[/path/to/foo, path_to_bar]"
+$ styn "copy_file[/path/to/foo, path_to_bar]"
 [ example.py - Starting task "clean" ]
 Cleaning build directory...
 [ example.py - Completed task "clean" ]
@@ -174,10 +176,10 @@ Copying from /path/to/foo to path_to_bar
 [ example.py - Completed task "copy_file" ]
 ```
 
-pynt can also accept keyword arguments.
+styn can also accept keyword arguments.
 
 ```bash
-$ pynt start[port=8888]
+$ styn start[port=8888]
 [ example.py - Starting task "clean" ]
 Cleaning build directory...
 [ example.py - Completed task "clean" ]
@@ -189,7 +191,7 @@ Generating HTML in directory "."
 Starting server at localhost:8888
 [ example.py - Completed task "start_server" ]
     
-$ pynt echo[hello,world,foo=bar,blah=123]
+$ styn echo[hello,world,foo=bar,blah=123]
 [ example.py - Starting task "echo" ]
 ('hello', 'world')
 {'blah': '123', 'foo': 'bar'}
@@ -206,17 +208,15 @@ from deploy_tasks import *
 from test_tasks import functional_tests, report_coverage
 ```
 
-## pynt-contrib
-   
-   [pynt-contrib](https://github.com/rags/pynt-contrib) contains a set of extra tasks/utilities. The idea is to keep this package simple and bloat-free.
    
 ## Contributors/Contributing
 
 
+* Raghunandan Rao - styn is preceded by and forked from [pynt](https://github.com/rags/pynt), which was created by [Raghunandan Rao](https://github.com/rags).
 * Calum J. Eadie - pynt is preceded by and forked from [microbuild](https://github.com/CalumJEadie/microbuild), which was created by [Calum J. Eadie](https://github.com/CalumJEadie).
 
 
-If you want to make changes the repo is at https://github.com/rags/pynt. You will need [pytest](http://www.pytest.org) to run the tests
+If you want to make changes the repo is at https://github.com/rags/styn. You will need [pytest](http://www.pytest.org) to run the tests
 
 ```bash
 $ ./b t
@@ -224,7 +224,9 @@ $ ./b t
 
 It will be great if you can raise a [pull request](https://help.github.com/articles/using-pull-requests) once you are done.
 
-*If you find any bugs or need new features please raise a ticket in the [issues section](https://github.com/rags/pynt/issues) of the github repo.*
+*If you find any bugs or need new features please raise a ticket in the [issues section](https://github.com/ldmoray/styn/issues) of the github repo.*
+
+Really, this is just a downstream fork to rename "tasks" to "chores" though.
     
 ## License
 
